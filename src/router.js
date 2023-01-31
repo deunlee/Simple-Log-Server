@@ -10,23 +10,30 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
     const { level, msg } = req.body;
     if (typeof level !== 'string' || typeof msg !== 'string') {
+        res.status(400);
         res.json({ success: false });
         return;
     }
+
+    const ip = req.socket.remoteAddress;
+    // req.headers['x-forwarded-for']
+    const message = `(${ip}) ${msg}`;
+
     switch (level) {
     case 'info':
-        logger.info(msg);
+        logger.info(message);
         break;
     case 'warn':
-        logger.warn(msg);
+        logger.warn(message);
         break;
     case 'error':
-        logger.error(msg);
+        logger.error(message);
         break;
     case 'debug':
-        logger.debug(msg);
+        logger.debug(message);
         break;
     default:
+        res.status(400);
         res.json({ success: false });
         return;
     }
